@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-02T15:17:32.805Z",
+  "actualizado": "2026-08-02T15:23:33.277Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -66,5 +66,13 @@
     }
   ],
   "aportaciones": [],
-  "gastos": []
+  "gastos": [
+    {
+      "id": "rgpvoer",
+      "concepto": "Reserva campo",
+      "importe": 20,
+      "pagador": "u6",
+      "fecha": "02/08"
+    }
+  ]
 }
