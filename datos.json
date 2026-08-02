@@ -1,0 +1,24 @@
+{
+  "redondeo": 1,
+  "actualizado": "2026-08-02T15:10:00.000Z",
+  "presupuesto": [
+    {"id": "p1", "concepto": "Carpa", "importe": 315},
+    {"id": "p2", "concepto": "Campo", "importe": 100},
+    {"id": "p3", "concepto": "Luz", "importe": 60},
+    {"id": "p4", "concepto": "Colchón para imprevistos", "importe": 55}
+  ],
+  "personas": [
+    {"id": "u1", "nombre": "Edu"},
+    {"id": "u2", "nombre": "Esme"},
+    {"id": "u3", "nombre": "Ariendys"},
+    {"id": "u4", "nombre": "Bryan"},
+    {"id": "u5", "nombre": "Elian"},
+    {"id": "u6", "nombre": "Pauly"},
+    {"id": "u7", "nombre": "Yeison"},
+    {"id": "u8", "nombre": "Cueco"},
+    {"id": "u9", "nombre": "Persona 9"},
+    {"id": "u10", "nombre": "Persona 10"}
+  ],
+  "aportaciones": [],
+  "gastos": []
+}

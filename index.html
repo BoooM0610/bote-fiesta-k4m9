@@ -1,68 +1,89 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="300">
 <meta name="theme-color" content="#0f766e">
 <title>Fiesta · en qué va el dinero</title>
-<style>
-:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2421;--muted:#6b7280;--line:#e3ded4;--accent:#0f766e;--accent-soft:#d7ece9;
---warn:#b45309;--warn-soft:#fdf0dc;--bad:#b91c1c;--bad-soft:#fbe6e4;--good:#15803d;--good-soft:#e2f2e6}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
-.wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
-h1{margin:0 0 4px;font-size:24px;letter-spacing:-.02em}
-.sub{margin:0;color:var(--muted);font-size:13px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-.stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.stat .val{font-size:21px;font-weight:650;margin-top:3px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.stat .s{font-size:12px;color:var(--muted);margin-top:2px}
-.stat.hi{background:var(--accent-soft);border-color:#bcdcd7}.stat.hi .val{color:var(--accent)}
-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-h2{margin:0 0 10px;font-size:15px;letter-spacing:-.01em}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;font-weight:600;padding:6px 6px;border-bottom:1px solid var(--line)}
-td{padding:8px 6px;border-bottom:1px solid #f0ece4}tr:last-child td{border-bottom:none}
-.num{text-align:right}.fecha{color:var(--muted);font-size:13px}
-.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}
-.pill.ok{background:var(--good-soft);color:var(--good)}.pill.debe{background:var(--bad-soft);color:var(--bad)}
-.pill.sobra{background:var(--warn-soft);color:var(--warn)}
-.tag{font-size:11px;color:var(--muted);background:#f2efe8;border-radius:6px;padding:2px 6px}
-.empty{color:var(--muted);font-size:13px}
-.bar{height:9px;background:#eee9df;border-radius:99px;overflow:hidden;margin:4px 0 10px}
-.bar > i{display:block;height:100%;background:var(--accent);border-radius:99px}
-.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:16px}
-</style></head><body><div class="wrap">
-<h1>Fiesta · en qué va el dinero</h1>
-<p class="sub">Solo para consultar · actualizado el 2 de agosto de 2026</p>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="wrap">
+  <h1>Fiesta · en qué va el dinero</h1>
+  <p class="sub" id="cabecera">Cargando…</p>
 
-<div class="cards">
-  <div class="stat"><div class="lbl">Presupuesto</div><div class="val">530,00 €</div><div class="s">entre 10 personas</div></div>
-  <div class="stat hi"><div class="lbl">Cuota por cabeza</div><div class="val">53,00 €</div><div class="s">lo que pone cada uno</div></div>
-  <div class="stat"><div class="lbl">Recaudado</div><div class="val">0,00 €</div><div class="s">de 530,00 €</div></div>
-  <div class="stat"><div class="lbl">Queda en el bote</div><div class="val">0,00 €</div><div class="s">efectivo disponible</div></div>
-  <div class="stat"><div class="lbl">Gastado</div><div class="val">0,00 €</div><div class="s">quedan 530,00 € por pagar</div></div>
-  <div class="stat"><div class="lbl">Falta por poner</div><div class="val" style="color:var(--bad)">530,00 €</div><div class="s">nadie de sobra</div></div>
+  <div class="cards" id="cards"></div>
+
+  <section>
+    <h2>Cómo va la recaudación</h2>
+    <div class="bar"><i id="barra" style="width:0%"></i></div>
+    <p class="sub" id="pctTxt"></p>
+  </section>
+
+  <section>
+    <h2>En qué se gasta</h2>
+    <div class="tblwrap"><table id="tPresu"></table></div>
+  </section>
+
+  <section>
+    <h2>Quién ha puesto qué</h2>
+    <div class="tblwrap"><table id="tPersonas"></table></div>
+  </section>
+
+  <section>
+    <h2>Pagos ya hechos</h2>
+    <div class="tblwrap"><table id="tGastos"></table></div>
+  </section>
+
+  <section>
+    <h2>Movimientos del bote</h2>
+    <div class="tblwrap"><table id="tAport"></table></div>
+  </section>
+
+  <p class="foot">Página de consulta · se actualiza sola cuando se apunta algo nuevo.</p>
 </div>
 
-<section>
-  <h2>Cómo va la recaudación</h2>
-  <div class="bar"><i style="width:0%"></i></div>
-  <p class="sub">0% del bote completo (530,00 €).</p>
-</section>
+<script src="motor.js"></script>
+<script>
+async function pintar(){
+  let S;
+  try { S = await cargarDatos(); }
+  catch(e){ document.getElementById('cabecera').textContent = 'No se pudieron cargar los datos. Prueba a recargar.'; return; }
 
-<section><h2>En qué se gasta</h2>
-<table><thead><tr><th>Concepto</th><th class="num">Importe</th><th>Estado</th></tr></thead><tbody><tr><td>Carpa</td><td class="num">315,00 €</td><td><span class="tag">pendiente</span></td></tr><tr><td>Campo</td><td class="num">100,00 €</td><td><span class="tag">pendiente</span></td></tr><tr><td>Luz</td><td class="num">60,00 €</td><td><span class="tag">pendiente</span></td></tr><tr><td>Colchón para imprevistos</td><td class="num">55,00 €</td><td><span class="tag">pendiente</span></td></tr>
-<tr><td style="font-weight:650">Total</td><td class="num" style="font-weight:650">530,00 €</td><td></td></tr></tbody></table></section>
+  const c = calc(S);
+  document.getElementById('cabecera').textContent =
+    'Solo para consultar · actualizado el ' + fechaLegible(S.actualizado);
+  document.getElementById('cards').innerHTML = tarjetas(c);
+  document.getElementById('barra').style.width = c.pct + '%';
+  document.getElementById('pctTxt').textContent =
+    c.pct + '% del bote completo (' + eur(c.objetivo) + ').';
 
-<section><h2>Quién ha puesto qué</h2>
-<table><thead><tr><th>Persona</th><th class="num">Ha puesto</th><th class="num">Estado</th></tr></thead><tbody><tr><td>Edu</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Esme</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Ariendys</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Bryan</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Elian</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Pauly</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Yeison</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Cueco</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Persona 9</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr><tr><td>Persona 10</td><td class="num">0,00 €</td><td class="num"><span class="pill debe">falta 53,00 €</span></td></tr></tbody></table></section>
+  document.getElementById('tPresu').innerHTML =
+    `<thead><tr><th>Concepto</th><th class="num">Importe</th><th>Estado</th></tr></thead><tbody>` +
+    S.presupuesto.map(p => `<tr><td>${esc(p.concepto)}</td><td class="num">${eur(p.importe)}</td><td>${estadoConcepto(S, p.concepto, p.importe)}</td></tr>`).join('') +
+    `<tr><td style="font-weight:650">Total</td><td class="num" style="font-weight:650">${eur(c.totalPresu)}</td><td></td></tr></tbody>`;
 
-<section><h2>Pagos ya hechos</h2>
-<table><thead><tr><th>Concepto</th><th class="num">Importe</th><th>Pagado por</th><th>Fecha</th></tr></thead><tbody><tr><td colspan="4" class="empty">Todavía no se ha pagado nada.</td></tr></tbody></table></section>
+  document.getElementById('tPersonas').innerHTML =
+    `<thead><tr><th>Persona</th><th class="num">Ha puesto</th><th class="num">Estado</th></tr></thead><tbody>` +
+    c.porPersona.map(p => `<tr><td>${esc(p.nombre)}</td><td class="num">${eur(p.total)}${p.adelantado ? ` <span class="tag">${eur(p.adelantado)} adelantados</span>` : ''}</td><td class="num">${pill(p.saldo)}</td></tr>`).join('') +
+    `</tbody>`;
 
-<section><h2>Movimientos del bote</h2>
-<table><thead><tr><th>Persona</th><th class="num">Importe</th><th>Nota</th><th>Fecha</th></tr></thead><tbody><tr><td colspan="4" class="empty">Todavía no ha puesto nadie.</td></tr></tbody></table></section>
+  document.getElementById('tGastos').innerHTML =
+    `<thead><tr><th>Concepto</th><th class="num">Importe</th><th>Pagado por</th><th>Fecha</th></tr></thead><tbody>` +
+    (S.gastos.length ? [...S.gastos].reverse().map(g =>
+      `<tr><td>${esc(g.concepto)}</td><td class="num">${eur(g.importe)}</td><td>${g.pagador==='bote' ? '<span class="tag">bote</span>' : esc(nombreDe(S,g.pagador)) + ' <span class="tag">adelanto</span>'}</td><td class="fecha">${esc(g.fecha||'')}</td></tr>`
+    ).join('') : `<tr><td colspan="4" class="empty">Todavía no se ha pagado nada.</td></tr>`) + `</tbody>`;
 
-<p class="foot">Esta página es solo de consulta: cualquier cambio lo hace quien lleva el bote.</p>
-</div></body></html>
+  document.getElementById('tAport').innerHTML =
+    `<thead><tr><th>Persona</th><th class="num">Importe</th><th>Nota</th><th>Fecha</th></tr></thead><tbody>` +
+    (S.aportaciones.length ? [...S.aportaciones].reverse().map(a =>
+      `<tr><td>${esc(nombreDe(S,a.personaId))}</td><td class="num" style="color:${a.importe<0?'var(--warn)':'inherit'}">${eur(a.importe)}</td><td class="fecha">${esc(a.nota||'')}</td><td class="fecha">${esc(a.fecha||'')}</td></tr>`
+    ).join('') : `<tr><td colspan="4" class="empty">Todavía no ha puesto nadie.</td></tr>`) + `</tbody>`;
+}
+
+pintar();
+setInterval(pintar, 120000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pintar(); });
+</script>
+</body>
+</html>

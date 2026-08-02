@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f766e">
+<title>Control del bote (privado)</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="wrap">
+  <h1>Control del bote</h1>
+  <p class="sub">Tu panel. Apunta aquí y dale a <strong>Publicar</strong>: el grupo lo ve al momento.</p>
+
+  <div class="bar-pub">
+    <span class="dot" id="dot"></span>
+    <span id="estadoTxt" style="font-size:14px">Cargando…</span>
+    <div class="spacer"></div>
+    <button class="btn" id="btnPub" onclick="publicar()" disabled>Publicar cambios</button>
+    <button class="btn ghost sm" onclick="recargar()">Recargar</button>
+    <button class="btn ghost sm" onclick="pedirToken(true)">Token</button>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <section>
+    <h2>Presupuesto</h2>
+    <p class="hint">Edita cualquier importe y las cuotas se ajustan solas.</p>
+    <div class="tblwrap"><table id="tPresu"></table></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn ghost sm" onclick="addPresu()">+ Añadir concepto</button>
+      <div class="spacer"></div>
+      <label style="font-size:13px;color:var(--muted)">Redondear cuota a
+        <select id="redondeo" style="width:auto;display:inline-block;margin-left:6px" onchange="setRedondeo(this.value)">
+          <option value="0">céntimo exacto</option>
+          <option value="1">1 €</option>
+          <option value="5">5 €</option>
+          <option value="10">10 €</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Personas y saldos</h2>
+    <p class="hint">Lo aportado incluye el dinero del bote y lo que cada uno haya adelantado de su bolsillo.</p>
+    <div class="tblwrap"><table id="tPersonas"></table></div>
+    <div class="form g3" style="margin-top:12px">
+      <input type="text" id="npNombre" placeholder="Nombre" class="full" onkeydown="if(event.key==='Enter')addPersona()">
+      <button class="btn sm" onclick="addPersona()">+ Añadir persona</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dinero metido al bote</h2>
+    <p class="hint">Para devolver dinero a alguien, pon el importe en negativo.</p>
+    <div class="form">
+      <select id="apPersona"></select>
+      <input type="number" id="apImporte" placeholder="€" step="0.01">
+      <input type="text" id="apNota" placeholder="Nota: bizum, efectivo…" class="full">
+      <button class="btn sm" onclick="addAportacion()">Apuntar</button>
+    </div>
+    <div class="tblwrap"><table id="tAport"></table></div>
+  </section>
+
+  <section>
+    <h2>Gastos pagados</h2>
+    <p class="hint">Si lo adelanta alguien de su bolsillo, cuenta como aportación suya.</p>
+    <div class="form">
+      <input type="text" id="gaConcepto" placeholder="Concepto: carpa, luz…">
+      <input type="number" id="gaImporte" placeholder="€" step="0.01">
+      <select id="gaPagador" class="full"></select>
+      <button class="btn sm" onclick="addGasto()">Apuntar</button>
+    </div>
+    <div class="tblwrap"><table id="tGastos"></table></div>
+  </section>
+
+  <p class="foot">Esta página no la puede usar nadie sin tu token. La de consulta del grupo es <a href="./">esta</a>.</p>
+</div>
+
+<script src="motor.js"></script>
+<script>
+const REPO = 'BoooM0610/bote-fiesta-k4m9';
+const RUTA = 'datos.json';
+const RAMA = 'main';
+const CLAVE = 'bote_fiesta_token';
+
+let S = null, sha = null, sucio = false;
+
+function token(){ return localStorage.getItem(CLAVE) || ''; }
+
+function pedirToken(forzar){
+  const actual = token();
+  if (actual && !forzar) return actual;
+  const t = prompt('Pega tu token de GitHub (empieza por github_pat_). Se guarda solo en este navegador.', actual);
+  if (t !== null) { localStorage.setItem(CLAVE, t.trim()); marcar(); }
+  return token();
+}
+
+function marcar(cambio){
+  if (cambio) sucio = true;
+  const dot = document.getElementById('dot');
+  const txt = document.getElementById('estadoTxt');
+  const btn = document.getElementById('btnPub');
+  if (!token()) { dot.className = 'dot pend'; txt.textContent = 'Falta el token para poder publicar'; btn.disabled = true; return; }
+  btn.disabled = !sucio;
+  dot.className = sucio ? 'dot pend' : 'dot';
+  txt.textContent = sucio ? 'Cambios sin publicar' : 'Todo publicado' + (S && S.actualizado ? ' · ' + fechaLegible(S.actualizado) : '');
+}
+
+async function recargar(){
+  if (sucio && !confirm('Tienes cambios sin publicar. ¿Recargar y perderlos?')) return;
+  try {
+    S = await cargarDatos();
+    sucio = false;
+    await leerSha();
+    render();
+  } catch(e){ alert('No se pudieron cargar los datos: ' + e.message); }
+}
+
+async function leerSha(){
+  if (!token()) return;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${RUTA}?ref=${RAMA}`, {
+      headers: {Authorization: 'Bearer ' + token(), Accept: 'application/vnd.github+json'}
+    });
+    if (r.ok) { const j = await r.json(); sha = j.sha; }
+  } catch(e){ /* sin conexión a la API: se reintenta al publicar */ }
+}
+
+function b64(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+
+async function publicar(){
+  if (!pedirToken()) return;
+  const btn = document.getElementById('btnPub');
+  btn.disabled = true;
+  document.getElementById('estadoTxt').textContent = 'Publicando…';
+  S.actualizado = new Date().toISOString();
+  try {
+    if (!sha) await leerSha();
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${RUTA}`, {
+      method: 'PUT',
+      headers: {Authorization: 'Bearer ' + token(), Accept: 'application/vnd.github+json', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        message: 'Actualizar bote (' + new Date().toLocaleString('es-ES') + ')',
+        content: b64(JSON.stringify(S, null, 2)),
+        sha: sha || undefined,
+        branch: RAMA
+      })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.message || ('Error ' + r.status));
+    sha = j.content.sha;
+    sucio = false;
+    marcar();
+    document.getElementById('estadoTxt').textContent = 'Publicado ✓ el grupo lo verá en menos de un minuto';
+  } catch(e){
+    document.getElementById('estadoTxt').textContent = 'No se pudo publicar: ' + e.message;
+    btn.disabled = false;
+    if (/401|403|Bad credentials/i.test(e.message)) pedirToken(true);
+  }
+}
+
+/* ---------- render ---------- */
+function render(){
+  if (!S) return;
+  const c = calc(S);
+  document.getElementById('cards').innerHTML = tarjetas(c);
+
+  document.getElementById('tPresu').innerHTML =
+    `<thead><tr><th>Concepto</th><th class="num" style="width:130px">Importe</th><th style="width:110px">Estado</th><th style="width:36px"></th></tr></thead><tbody>` +
+    S.presupuesto.map(p => `<tr>
+      <td><input class="cell-in" value="${esc(p.concepto)}" oninput="upd('presupuesto','${p.id}','concepto',this.value)"></td>
+      <td class="num"><input class="cell-in" type="number" step="0.01" style="text-align:right" value="${p.importe}" oninput="upd('presupuesto','${p.id}','importe',this.value)"></td>
+      <td>${estadoConcepto(S, p.concepto, p.importe)}</td>
+      <td><button class="x" onclick="del('presupuesto','${p.id}')">×</button></td></tr>`).join('') +
+    `<tr><td style="font-weight:650">Total</td><td class="num" style="font-weight:650;padding-right:14px">${eur(c.totalPresu)}</td><td colspan="2"></td></tr></tbody>`;
+
+  document.getElementById('tPersonas').innerHTML =
+    `<thead><tr><th>Persona</th><th class="num">Al bote</th><th class="num">Adelantado</th><th class="num">Total</th><th class="num">Saldo</th><th style="width:160px"></th></tr></thead><tbody>` +
+    (c.porPersona.length ? c.porPersona.map(p => {
+      const falta = Math.max(0, Math.round(-p.saldo * 100) / 100);
+      return `<tr>
+        <td><input class="cell-in" value="${esc(p.nombre)}" oninput="upd('personas','${p.id}','nombre',this.value)"></td>
+        <td class="num">${eur(p.alBote)}</td>
+        <td class="num">${p.adelantado ? eur(p.adelantado) : '<span style="color:var(--muted)">—</span>'}</td>
+        <td class="num" style="font-weight:600">${eur(p.total)}</td>
+        <td class="num">${pill(p.saldo)}</td>
+        <td class="num">${falta > 0 ? `<button class="btn ghost sm" onclick="pagarCuota('${p.id}',${falta})">Ha puesto ${eur(falta)}</button>` : ''}
+        <button class="x" onclick="del('personas','${p.id}')">×</button></td></tr>`;
+    }).join('') : `<tr><td colspan="6" class="empty">Añade a la gente del grupo.</td></tr>`) + `</tbody>`;
+
+  keepSel('apPersona', S.personas.map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join(''));
+  keepSel('gaPagador', `<option value="bote">Pagado con el bote</option>` +
+    S.personas.map(p => `<option value="${p.id}">Adelantado por ${esc(p.nombre)}</option>`).join(''));
+
+  document.getElementById('tAport').innerHTML =
+    `<thead><tr><th>Persona</th><th class="num" style="width:110px">Importe</th><th>Nota</th><th style="width:80px">Fecha</th><th style="width:36px"></th></tr></thead><tbody>` +
+    (S.aportaciones.length ? [...S.aportaciones].reverse().map(a => `<tr>
+      <td>${esc(nombreDe(S,a.personaId))}</td>
+      <td class="num" style="font-weight:600;color:${a.importe<0?'var(--warn)':'inherit'}">${eur(a.importe)}</td>
+      <td class="fecha">${esc(a.nota||'')}</td>
+      <td class="fecha">${esc(a.fecha||'')}</td>
+      <td><button class="x" onclick="del('aportaciones','${a.id}')">×</button></td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">Todavía no ha puesto nadie.</td></tr>`) + `</tbody>`;
+
+  document.getElementById('tGastos').innerHTML =
+    `<thead><tr><th>Concepto</th><th class="num" style="width:110px">Importe</th><th>Pagado por</th><th style="width:80px">Fecha</th><th style="width:36px"></th></tr></thead><tbody>` +
+    (S.gastos.length ? [...S.gastos].reverse().map(g => `<tr>
+      <td>${esc(g.concepto)}</td>
+      <td class="num" style="font-weight:600">${eur(g.importe)}</td>
+      <td>${g.pagador==='bote' ? '<span class="tag">bote</span>' : esc(nombreDe(S,g.pagador)) + ' <span class="tag">adelanto</span>'}</td>
+      <td class="fecha">${esc(g.fecha||'')}</td>
+      <td><button class="x" onclick="del('gastos','${g.id}')">×</button></td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">Aún no se ha pagado nada.</td></tr>`) + `</tbody>`;
+
+  document.getElementById('redondeo').value = S.redondeo ?? 1;
+  marcar();
+}
+
+function keepSel(id, html){
+  const el = document.getElementById(id), prev = el.value;
+  el.innerHTML = html;
+  if ([...el.options].some(o => o.value === prev)) el.value = prev;
+}
+
+/* ---------- acciones ---------- */
+function upd(lista, id, campo, val){
+  const it = S[lista].find(x => x.id === id); if (!it) return;
+  it[campo] = (campo === 'importe') ? (val === '' ? 0 : parseFloat(val)) : val;
+  sucio = true;
+  if (campo === 'importe' || lista === 'personas') render(); else marcar();
+}
+function del(lista, id){
+  if (!confirm('¿Borrar esta línea?')) return;
+  S[lista] = S[lista].filter(x => x.id !== id); sucio = true; render();
+}
+function addPresu(){ S.presupuesto.push({id:uid(), concepto:'Nuevo concepto', importe:0}); sucio = true; render(); }
+function setRedondeo(v){ S.redondeo = +v; sucio = true; render(); }
+function addPersona(){
+  const n = document.getElementById('npNombre').value.trim(); if (!n) return;
+  S.personas.push({id:uid(), nombre:n});
+  document.getElementById('npNombre').value = ''; sucio = true; render();
+}
+function addAportacion(){
+  const pid = document.getElementById('apPersona').value;
+  const imp = parseFloat(document.getElementById('apImporte').value);
+  if (!pid || isNaN(imp) || imp === 0) return;
+  S.aportaciones.push({id:uid(), personaId:pid, importe:imp, nota:document.getElementById('apNota').value.trim(), fecha:hoy()});
+  document.getElementById('apImporte').value = ''; document.getElementById('apNota').value = '';
+  sucio = true; render();
+}
+function pagarCuota(pid, imp){
+  S.aportaciones.push({id:uid(), personaId:pid, importe:imp, nota:'cuota', fecha:hoy()});
+  sucio = true; render();
+}
+function addGasto(){
+  const con = document.getElementById('gaConcepto').value.trim();
+  const imp = parseFloat(document.getElementById('gaImporte').value);
+  if (!con || isNaN(imp) || imp === 0) return;
+  S.gastos.push({id:uid(), concepto:con, importe:imp, pagador:document.getElementById('gaPagador').value, fecha:hoy()});
+  document.getElementById('gaConcepto').value = ''; document.getElementById('gaImporte').value = '';
+  sucio = true; render();
+}
+
+window.addEventListener('beforeunload', e => { if (sucio) { e.preventDefault(); e.returnValue = ''; } });
+
+(async () => {
+  try { S = await cargarDatos(); } catch(e){ alert('No se pudieron cargar los datos: ' + e.message); return; }
+  if (!token()) pedirToken(true);
+  await leerSha();
+  render();
+})();
+</script>
+</body>
+</html>
