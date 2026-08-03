@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-02T15:23:33.277Z",
+  "actualizado": "2026-08-03T08:32:52.617Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -65,7 +65,15 @@
       "nombre": "Nato"
     }
   ],
-  "aportaciones": [],
+  "aportaciones": [
+    {
+      "id": "l3f1tdg",
+      "personaId": "u1",
+      "importe": 63,
+      "nota": "cuota",
+      "fecha": "03/08"
+    }
+  ],
   "gastos": [
     {
       "id": "rgpvoer",
