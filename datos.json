@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-08T11:11:26.079Z",
+  "actualizado": "2026-08-08T15:42:37.960Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -20,7 +20,7 @@
     {
       "id": "p4",
       "concepto": "Colchón para imprevistos",
-      "importe": 150
+      "importe": 213
     }
   ],
   "personas": [
@@ -63,6 +63,10 @@
     {
       "id": "u10",
       "nombre": "Nato"
+    },
+    {
+      "id": "lkix8w8",
+      "nombre": "Leo"
     }
   ],
   "aportaciones": [
@@ -90,6 +94,13 @@
     {
       "id": "6my8e6j",
       "personaId": "u2",
+      "importe": 63,
+      "nota": "cuota",
+      "fecha": "08/08"
+    },
+    {
+      "id": "moniksg",
+      "personaId": "lkix8w8",
       "importe": 63,
       "nota": "cuota",
       "fecha": "08/08"
