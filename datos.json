@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-04T16:05:55.514Z",
+  "actualizado": "2026-08-08T11:11:26.079Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -86,6 +86,13 @@
       "importe": 63,
       "nota": "cuota",
       "fecha": "04/08"
+    },
+    {
+      "id": "6my8e6j",
+      "personaId": "u2",
+      "importe": 63,
+      "nota": "cuota",
+      "fecha": "08/08"
     }
   ],
   "gastos": [
