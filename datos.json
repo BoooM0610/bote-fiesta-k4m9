@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-09T00:53:30.624Z",
+  "actualizado": "2026-08-09T14:45:50.471Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -141,6 +141,13 @@
       "importe": 20,
       "pagador": "u6",
       "fecha": "02/08"
+    },
+    {
+      "id": "igl4zxh",
+      "concepto": "Carpa",
+      "importe": 315,
+      "pagador": "bote",
+      "fecha": "09/08"
     }
   ]
 }
