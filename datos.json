@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-08T15:42:37.960Z",
+  "actualizado": "2026-08-09T00:39:14.689Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -104,6 +104,34 @@
       "importe": 63,
       "nota": "cuota",
       "fecha": "08/08"
+    },
+    {
+      "id": "otnfd3p",
+      "personaId": "u6",
+      "importe": 43,
+      "nota": "cuota",
+      "fecha": "09/08"
+    },
+    {
+      "id": "cr3v1e1",
+      "personaId": "u7",
+      "importe": 63,
+      "nota": "cuota",
+      "fecha": "09/08"
+    },
+    {
+      "id": "7plxt25",
+      "personaId": "u8",
+      "importe": 63,
+      "nota": "cuota",
+      "fecha": "09/08"
+    },
+    {
+      "id": "jrzefpx",
+      "personaId": "u9",
+      "importe": 63,
+      "nota": "cuota",
+      "fecha": "09/08"
     }
   ],
   "gastos": [
