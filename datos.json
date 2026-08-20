@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-20T12:46:53.260Z",
+  "actualizado": "2026-08-20T22:03:00.445Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -21,6 +21,11 @@
       "id": "p4",
       "concepto": "Colchón para imprevistos",
       "importe": 213
+    },
+    {
+      "id": "uphys5t",
+      "concepto": "Nuevo concepto",
+      "importe": 110
     }
   ],
   "personas": [
