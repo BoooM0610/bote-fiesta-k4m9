@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-20T12:36:32.220Z",
+  "actualizado": "2026-08-20T12:37:05.376Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -203,6 +203,13 @@
       "concepto": "Clavos",
       "importe": 1.5,
       "pagador": "bote",
+      "fecha": "20/08"
+    },
+    {
+      "id": "pdfhaif",
+      "concepto": "2 sacos hielo",
+      "importe": 10,
+      "pagador": "u6",
       "fecha": "20/08"
     }
   ]
