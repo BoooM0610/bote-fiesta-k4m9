@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-21T11:34:12.851Z",
+  "actualizado": "2026-08-21T11:35:39.235Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -237,6 +237,13 @@
       "importe": 10,
       "pagador": "u6",
       "fecha": "20/08"
+    },
+    {
+      "id": "6ukntc0",
+      "concepto": "Candado, cadena,…",
+      "importe": 18.77,
+      "pagador": "bote",
+      "fecha": "21/08"
     }
   ]
 }
