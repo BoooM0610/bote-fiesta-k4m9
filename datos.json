@@ -1,6 +1,6 @@
 {
   "redondeo": 1,
-  "actualizado": "2026-08-22T15:08:05.862Z",
+  "actualizado": "2026-08-22T15:09:46.932Z",
   "presupuesto": [
     {
       "id": "p1",
@@ -279,6 +279,13 @@
       "importe": 8.85,
       "pagador": "bote",
       "fecha": "21/08"
+    },
+    {
+      "id": "nruun6e",
+      "concepto": "Basura, cubo, etc",
+      "importe": 29,
+      "pagador": "bote",
+      "fecha": "22/08"
     }
   ]
 }
